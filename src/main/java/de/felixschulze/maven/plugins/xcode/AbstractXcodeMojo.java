@@ -142,6 +142,13 @@ public abstract class AbstractXcodeMojo extends AbstractMojo {
     protected String appName;
 
     /**
+     * Optional Coverage App Name for static libraries
+     *
+     * @parameter
+     */
+    protected String coverageAppName;
+
+    /**
      * App Name
      *
      * @parameter
@@ -160,7 +167,7 @@ public abstract class AbstractXcodeMojo extends AbstractMojo {
      *
      * @parameter default-value="False"
      */
-    protected Boolean testTeamCityLog;
+    protected Boolean teamCityLog;
 
     /**
      * App Name

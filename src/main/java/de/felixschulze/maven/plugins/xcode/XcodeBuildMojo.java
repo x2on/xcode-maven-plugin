@@ -20,6 +20,7 @@ import java.io.*;
 import java.util.*;
 
 import de.felixschulze.maven.plugins.xcode.helper.GitHelper;
+import de.felixschulze.maven.plugins.xcode.helper.TeamCityHelper;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.eclipse.jgit.api.errors.NoHeadException;
 import xmlwise.Plist;
@@ -38,6 +39,8 @@ public class XcodeBuildMojo extends AbstractXcodeMojo {
     private final String BUNDLE_IDENTIFIER_KEY = "CFBundleIdentifier";
     private final String BUNDLE_DISPLAY_NAME_KEY = "CFBundleDisplayName";
     private final String BUNDLE_VERSION_KEY = "CFBundleVersion";
+    private final String INTERFACE_BUILDER_ERROR = "Interface Builder encountered an error communicating with the iOS Simulator.";
+    private final String IBTOOL_ERROR = "Exception while running ibtool: connection went invalid while waiting for a reply because a mach port died";
 
     /**
      * Execute the xcode command line utility.
@@ -87,11 +90,25 @@ public class XcodeBuildMojo extends AbstractXcodeMojo {
         getLog().info(xcodeCommandLine.getAbsolutePath() + " " + commands.toString());
 
         try {
-            executor.executeCommand(xcodeCommandLine.getAbsolutePath(), commands, true);
+            executor.executeCommand(xcodeCommandLine.getAbsolutePath(), commands, false);
 
         } catch (ExecutionException e) {
-            getLog().error(executor.getStandardOut());
-            getLog().error(executor.getStandardError());
+            String errorString = executor.getStandardError();
+            String outPutString = executor.getStandardOut();
+
+            String cleanedErrorString = errorString.substring(errorString.indexOf("** BUILD FAILED **"));
+            if (errorString.contains(INTERFACE_BUILDER_ERROR) || errorString.contains(IBTOOL_ERROR)
+                    || outPutString.contains(INTERFACE_BUILDER_ERROR) || outPutString.contains(IBTOOL_ERROR)) {
+                if (teamCityLog) {
+                    getLog().error("##teamcity[buildStatus status='FAILURE' text='Interface builder crashed']");
+                }
+                getLog().error("Interface builder crashed.");
+            } else {
+                if (teamCityLog) {
+                    getLog().error("##teamcity[message text='BUILD FAILED' errorDetails='"+TeamCityHelper.escapeString(cleanedErrorString)+"' status='ERROR']");
+                    getLog().error("##teamcity[buildStatus status='FAILURE' text='Build failed']");
+                }
+            }
             throw new MojoExecutionException("Error while executing: ", e);
         }
 
@@ -129,7 +146,7 @@ public class XcodeBuildMojo extends AbstractXcodeMojo {
                     }
                 }
             }
-            if (bundleVersionFromGit != null) {
+            if (bundleVersionFromGit) {
                 if (properties.containsKey(BUNDLE_VERSION_KEY)) {
                     try {
                         File gitDir = new File(basedir, ".git");
@@ -145,6 +162,9 @@ public class XcodeBuildMojo extends AbstractXcodeMojo {
                                 getLog().info("Change version to: " + version);
                                 changeInPlist = true;
                                 properties.put(BUNDLE_VERSION_KEY, version);
+                                if (teamCityLog) {
+                                    getLog().info(TeamCityHelper.createVersionLog(version));
+                                }
                             }
                         }
                     } catch (NoHeadException e) {

@@ -16,13 +16,8 @@
 
 package de.felixschulze.maven.plugins.xcode;
 
-import de.felixschulze.maven.plugins.xcode.AbstractXcodeMojo;
-import de.felixschulze.maven.plugins.xcode.CommandExecutor;
-import de.felixschulze.maven.plugins.xcode.ExecutionException;
 import de.felixschulze.maven.plugins.xcode.helper.ProcessHelper;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.MavenProject;
 
 import java.io.File;
 import java.io.IOException;
@@ -83,7 +78,7 @@ public class GHUnitTestMojo extends AbstractXcodeMojo {
                 commands.add("GHUNIT_AUTOEXIT=YES");
             }
 
-            if (testTeamCityLog) {
+            if (teamCityLog) {
                 commands.add("--setenv");
                 commands.add("TEAMCITY_LOG=YES");
             }
@@ -128,10 +123,18 @@ public class GHUnitTestMojo extends AbstractXcodeMojo {
                 commands.add("--directory");
 
                 File coverageObjectsDir = buildDirectory;
+
+                String buildFolderName;
+                if (coverageAppName != null) {
+                    buildFolderName = coverageAppName + ".build";
+                }
+                else {
+                    buildFolderName = appName + ".build";
+                }
                 String[] directoryStructure = {
                         xcodeProject.getName().replace(".xcodeproj", ".build"),
                         xcodeConfiguration + "-iphonesimulator",
-                        appName + ".build",
+                        buildFolderName,
                         "Objects-normal",
                         "i386"
                 };
@@ -170,7 +173,7 @@ public class GHUnitTestMojo extends AbstractXcodeMojo {
                     Matcher matcher = pattern.matcher(errorOut);
 
                     while (matcher.find()) {
-                        if (testTeamCityLog) {
+                        if (teamCityLog) {
                             getLog().info("##teamcity[buildStatisticValue key='CodeCoverageL' value='" + matcher.group(1) + "'");
                             getLog().info("##teamcity[buildStatisticValue key='CodeCoverageAbsLCovered' value='" + matcher.group(2) + "'");
                             getLog().info("##teamcity[buildStatisticValue key='CodeCoverageAbsLTotal' value='" + matcher.group(3) + "'");
@@ -181,7 +184,7 @@ public class GHUnitTestMojo extends AbstractXcodeMojo {
                 }
 
                 //Generate HTML Report
-                File coverageReportDir = new File(buildDirectory, "coverage");
+                File coverageReportDir = new File(new File(buildDirectory, "artifacts"), "coverage");
                 coverageReportDir.mkdirs();
 
                 try {
