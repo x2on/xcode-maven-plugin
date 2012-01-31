@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>xcode</role-hint>
+      <implementation>
+				org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping
+      </implementation>
+      <configuration>
+        <phases>
+          <clean>de.felixschulze.maven.plugins.xcode:xcode-maven-plugin:xcodebuild-clean</clean>
+          <compile>de.felixschulze.maven.plugins.xcode:xcode-maven-plugin:xcodebuild</compile>
+          <test>de.felixschulze.maven.plugins.xcode:xcode-maven-plugin:ghunittest</test>
+          <package>de.felixschulze.maven.plugins.xcode:xcode-maven-plugin:ipaBuilder</package>
+          <install>org.apache.maven.plugins:maven-install-plugin:install</install>
+          <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
+        </phases>
+      </configuration>
+    </component>
+  </components>
+</component-set>

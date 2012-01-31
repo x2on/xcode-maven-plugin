@@ -1,0 +1,164 @@
+/*
+ * Copyright (C) 2012 Felix Schulze
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.felixschulze.maven.plugins.xcode;
+
+import java.io.*;
+import java.util.*;
+
+import de.felixschulze.maven.plugins.xcode.helper.GitHelper;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.eclipse.jgit.api.errors.NoHeadException;
+import xmlwise.Plist;
+import xmlwise.XmlParseException;
+
+/**
+ * Run the xcodebuild command line program
+ *
+ * @goal xcodebuild
+ * @phase compile
+ * @author <a href="mail@felixschulze.de">Felix Schulze</a>
+ */
+public class XcodeBuildMojo extends AbstractXcodeMojo {
+
+
+    private final String BUNDLE_IDENTIFIER_KEY = "CFBundleIdentifier";
+    private final String BUNDLE_DISPLAY_NAME_KEY = "CFBundleDisplayName";
+    private final String BUNDLE_VERSION_KEY = "CFBundleVersion";
+
+    /**
+     * Execute the xcode command line utility.
+     */
+    public void execute() throws MojoExecutionException {
+        if (!xcodeCommandLine.exists()) {
+            throw new MojoExecutionException("Invalid path for xcodebuild: " + xcodeCommandLine.getAbsolutePath());
+        }
+
+        CommandExecutor executor = CommandExecutor.Factory.createDefaultCommmandExecutor();
+        executor.setLogger(this.getLog());
+        List<String> commands = new ArrayList<String>();
+
+        if (xcodeProject != null) {
+            commands.add("-project");
+            commands.add(xcodeProject.getAbsolutePath());
+        }
+        if (xcodeTarget != null) {
+            commands.add("-target");
+            commands.add(xcodeTarget);
+        }
+        if (xcodeConfiguration != null) {
+            commands.add("-configuration");
+            commands.add(xcodeConfiguration);
+        }
+
+        if (xcodeSdk != null) {
+            commands.add("-sdk");
+            commands.add(xcodeSdk);
+        }
+
+        commands.add("OBJROOT=" + buildDirectory);
+        commands.add("SYMROOT=" + buildDirectory);
+        commands.add("DSTROOT=" + buildDirectory);
+
+        if (provisioningProfile != null) {
+            commands.add("PROVISIONING_PROFILE=\"" + provisioningProfile + "\"");
+        }
+        if (codeSignIdentity != null) {
+            commands.add("CODE_SIGN_IDENTITY=" + codeSignIdentity);
+        }
+
+        if (infoPlist != null) {
+            changesValuesInPlist(executor);
+        }
+
+        getLog().info(xcodeCommandLine.getAbsolutePath() + " " + commands.toString());
+
+        try {
+            executor.executeCommand(xcodeCommandLine.getAbsolutePath(), commands, true);
+
+        } catch (ExecutionException e) {
+            getLog().error(executor.getStandardOut());
+            getLog().error(executor.getStandardError());
+            throw new MojoExecutionException("Error while executing: ", e);
+        }
+
+    }
+
+    private void changesValuesInPlist(CommandExecutor executor) {
+        try {
+            Map<String, Object> properties = Plist.load(infoPlist);
+
+            Boolean changeInPlist = false;
+
+            if (bundleIdentifierSuffix != null) {
+
+                if (properties.containsKey(BUNDLE_IDENTIFIER_KEY)) {
+
+                    String identifier = String.valueOf(properties.get(BUNDLE_IDENTIFIER_KEY));
+                    if (!identifier.endsWith(bundleIdentifierSuffix)) {
+                        getLog().info("Add suffix: \"" + bundleIdentifierSuffix + "\" for: \"" + BUNDLE_IDENTIFIER_KEY + "\"");
+                        identifier = identifier.concat(bundleIdentifierSuffix);
+                        changeInPlist = true;
+                        properties.put(BUNDLE_IDENTIFIER_KEY, identifier);
+                    }
+                }
+            }
+            if (bundleDisplayNameSuffix != null) {
+
+                if (properties.containsKey(BUNDLE_DISPLAY_NAME_KEY)) {
+
+                    String displayName = String.valueOf(properties.get(BUNDLE_DISPLAY_NAME_KEY));
+                    if (!displayName.endsWith(bundleDisplayNameSuffix)) {
+                        getLog().info("Add suffix: \"" + bundleDisplayNameSuffix + "\" for: \"" + BUNDLE_DISPLAY_NAME_KEY + "\"");
+                        displayName = displayName.concat(bundleDisplayNameSuffix);
+                        changeInPlist = true;
+                        properties.put(BUNDLE_DISPLAY_NAME_KEY, displayName);
+                    }
+                }
+            }
+            if (bundleVersionFromGit != null) {
+                if (properties.containsKey(BUNDLE_VERSION_KEY)) {
+                    try {
+                        File gitDir = new File(basedir, ".git");
+                        if (gitDir.exists()) {
+                            GitHelper gitHelper = new GitHelper(gitDir);
+                            int numberOfCommits = gitHelper.numberOfCommits();
+                            String uniqueShortId = gitHelper.currentHeadRef();
+
+                            if (numberOfCommits > 0 && uniqueShortId != null) {
+                                String version = String.valueOf(properties.get(BUNDLE_VERSION_KEY));
+                                String versionSuffix = "-" + numberOfCommits + "-" + uniqueShortId;
+                                version = version.concat(versionSuffix);
+                                getLog().info("Change version to: " + version);
+                                changeInPlist = true;
+                                properties.put(BUNDLE_VERSION_KEY, version);
+                            }
+                        }
+                    } catch (NoHeadException e) {
+                        getLog().warn("Error while getting version number from git: " + e);
+                    }
+                }
+            }
+            if (changeInPlist) {
+                Plist.store(properties, infoPlist);
+            }
+        } catch (XmlParseException e) {
+            getLog().warn("Error while parsing plist: " + e);
+        } catch (IOException e) {
+            getLog().warn("Can't find plist: " + e);
+        }
+    }
+}
