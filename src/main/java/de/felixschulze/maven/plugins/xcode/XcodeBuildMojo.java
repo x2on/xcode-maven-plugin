@@ -160,8 +160,10 @@ public class XcodeBuildMojo extends AbstractXcodeMojo {
                                 String versionSuffix = "-" + numberOfCommits + "-" + uniqueShortId;
                                 version = version.concat(versionSuffix);
                                 getLog().info("Change version to: " + version);
-                                changeInPlist = true;
-                                properties.put(BUNDLE_VERSION_KEY, version);
+                                if (!version.contains(versionSuffix)) {
+                                    changeInPlist = true;
+                                    properties.put(BUNDLE_VERSION_KEY, version);
+                                }
                                 if (teamCityLog) {
                                     getLog().info(TeamCityHelper.createVersionLog(version));
                                 }
