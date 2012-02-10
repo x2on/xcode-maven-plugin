@@ -9,7 +9,7 @@
       </implementation>
       <configuration>
         <phases>
-          <clean>de.felixschulze.maven.plugins.xcode:xcode-maven-plugin:xcodebuild-clean</clean>
+          <clean>org.apache.maven.plugins:maven-clean-plugin:clean</clean>
           <compile>de.felixschulze.maven.plugins.xcode:xcode-maven-plugin:xcodebuild</compile>
           <test>de.felixschulze.maven.plugins.xcode:xcode-maven-plugin:ghunittest</test>
           <package>de.felixschulze.maven.plugins.xcode:xcode-maven-plugin:ipaBuilder</package>
