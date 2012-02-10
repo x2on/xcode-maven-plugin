@@ -40,8 +40,14 @@ public abstract class AbstractXcodeMojo extends AbstractMojo {
      *
      * @parameter expression="${xcrun}" default-value="/usr/bin/xcrun"
      */
-
     protected File xcrunCommandLine;
+
+    /**
+     * Location of the plutil executable.
+     *
+     * @parameter expression="${plutil}" default-value="/usr/bin/plutil"
+     */
+    protected File plutilCommandLine;
 
     /**
      * Location of the xcodebuild executable.

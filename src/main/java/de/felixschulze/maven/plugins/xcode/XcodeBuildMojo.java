@@ -21,8 +21,13 @@ import java.util.*;
 
 import de.felixschulze.maven.plugins.xcode.helper.GitHelper;
 import de.felixschulze.maven.plugins.xcode.helper.TeamCityHelper;
+import de.felixschulze.maven.plugins.xcode.xcodeprojparser.PBXNativeTarget;
+import de.felixschulze.maven.plugins.xcode.xcodeprojparser.PBXProject;
+import de.felixschulze.maven.plugins.xcode.xcodeprojparser.XCBuildConfiguration;
+import de.felixschulze.maven.plugins.xcode.xcodeprojparser.XcodeprojParser;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.eclipse.jgit.api.errors.NoHeadException;
+import org.json.JSONException;
 import xmlwise.Plist;
 import xmlwise.XmlParseException;
 
@@ -51,9 +56,66 @@ public class XcodeBuildMojo extends AbstractXcodeMojo {
             throw new MojoExecutionException("Invalid path for xcodebuild: " + xcodeCommandLine.getAbsolutePath());
         }
 
+        if (!buildDirectory.exists()) {
+            buildDirectory.mkdir();
+        }
+
         CommandExecutor executor = CommandExecutor.Factory.createDefaultCommmandExecutor();
         executor.setLogger(this.getLog());
         List<String> commands = new ArrayList<String>();
+
+        //Parse XCode project (only for testing)
+        if (xcodeProject != null) {
+            if (!plutilCommandLine.exists()) {
+                throw new MojoExecutionException("Invalid path for plutil: " + plutilCommandLine.getAbsolutePath());
+            }
+
+            File xcodeprojJson = new File(buildDirectory, xcodeProject.getName() + ".json");
+            commands.add("-convert");
+            commands.add("json");
+            commands.add("-o");
+            commands.add(xcodeprojJson.getAbsolutePath());
+            commands.add(xcodeProject.getAbsolutePath() + "/project.pbxproj");
+            getLog().info(plutilCommandLine.getAbsolutePath() + " " + commands.toString());
+
+            try {
+                executor.executeCommand(plutilCommandLine.getAbsolutePath(), commands, false);
+            } catch (ExecutionException e) {
+                throw new MojoExecutionException("Error while executing: ", e);
+            }
+
+            if (xcodeprojJson.exists()) {
+                XcodeprojParser parser = new XcodeprojParser(xcodeprojJson);
+                try {
+                    PBXProject project = parser.parseXcodeFile();
+                    if (project != null) {
+                        for (PBXNativeTarget target : project.getTargets()) {
+                            if (target.getName().equalsIgnoreCase(xcodeTarget)) {
+                                getLog().info("=== PBXNativeTarget ===");
+                                getLog().info(" Target-Name: " + target.getName());
+                                getLog().info(" App-Name: " + target.getAppName());
+                                getLog().info(" Product-Name: " + target.getProductName());
+                                getLog().info(" Type: " + target.getType());
+
+                                for (XCBuildConfiguration buildConfiguration : target.getBuildConfigurations()) {
+                                    if (buildConfiguration.getName().equalsIgnoreCase(xcodeConfiguration)) {
+                                        getLog().info("==== XCBuildConfiguration ====");
+                                        getLog().info(" Name: " + buildConfiguration.getName());
+                                        getLog().info(" InfoPlist: " + buildConfiguration.getInfoPlist().getPath());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } catch (IOException e) {
+                    throw new MojoExecutionException("Error while executing: ", e);
+                } catch (JSONException e) {
+                    throw new MojoExecutionException("Error while executing: ", e);
+                }
+            }
+        }
+
+        commands = new ArrayList<String>();
 
         if (xcodeProject != null) {
             commands.add("-project");
