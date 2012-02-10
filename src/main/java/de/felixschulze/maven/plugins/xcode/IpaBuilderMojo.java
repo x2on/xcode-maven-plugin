@@ -59,7 +59,11 @@ public class IpaBuilderMojo extends AbstractXcodeMojo {
 
         commands.add(appFile.getAbsolutePath());
         commands.add("-o");
-        File ipaFile = new File(new File(buildDirectory, "artifacts"), appName + ".ipa");
+
+        File artifactsDir = new File(buildDirectory, "artifacts");
+        artifactsDir.mkdirs();
+
+        File ipaFile = new File(artifactsDir, appName + ".ipa");
         commands.add(ipaFile.getAbsolutePath());
 
         getLog().info(xcrunCommandLine.getAbsolutePath() + " " + commands.toString());
@@ -74,8 +78,6 @@ public class IpaBuilderMojo extends AbstractXcodeMojo {
         }
 
         ZipCreator creator = new ZipCreator(appDirectory);
-        File artifactsDir = new File(buildDirectory, "artifacts");
-        artifactsDir.mkdirs();
         File zipFile = new File(artifactsDir, appName + ".app.dSYM.zip");
 
         try {

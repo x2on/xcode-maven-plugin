@@ -40,6 +40,7 @@ public class XcodeBuildMojo extends AbstractXcodeMojo {
     private final String BUNDLE_DISPLAY_NAME_KEY = "CFBundleDisplayName";
     private final String BUNDLE_VERSION_KEY = "CFBundleVersion";
     private final String INTERFACE_BUILDER_ERROR = "Interface Builder encountered an error communicating with the iOS Simulator.";
+    private final String COMPILE_XIB_ERROR = "CompileXIB";
     private final String IBTOOL_ERROR = "Exception while running ibtool: connection went invalid while waiting for a reply because a mach port died";
 
     /**
@@ -105,8 +106,14 @@ public class XcodeBuildMojo extends AbstractXcodeMojo {
                 getLog().error("Interface builder crashed.");
             } else {
                 if (teamCityLog) {
-                    getLog().error("##teamcity[message text='BUILD FAILED' errorDetails='"+TeamCityHelper.escapeString(cleanedErrorString)+"' status='ERROR']");
-                    getLog().error("##teamcity[buildStatus status='FAILURE' text='Build failed']");
+                    if (cleanedErrorString != null) {
+                        getLog().error("##teamcity[message text='BUILD FAILED' errorDetails='" + TeamCityHelper.escapeString(cleanedErrorString) + "' status='ERROR']");
+                        if (cleanedErrorString.contains(COMPILE_XIB_ERROR)) {
+                            getLog().error("##teamcity[buildStatus status='FAILURE' text='Interface builder crashed']");
+                        } else {
+                            getLog().error("##teamcity[buildStatus status='FAILURE' text='Build failed']");
+                        }
+                    }
                 }
             }
             throw new MojoExecutionException("Error while executing: ", e);
@@ -158,9 +165,9 @@ public class XcodeBuildMojo extends AbstractXcodeMojo {
                             if (numberOfCommits > 0 && uniqueShortId != null) {
                                 String version = String.valueOf(properties.get(BUNDLE_VERSION_KEY));
                                 String versionSuffix = "-" + numberOfCommits + "-" + uniqueShortId;
-                                version = version.concat(versionSuffix);
-                                getLog().info("Change version to: " + version);
                                 if (!version.contains(versionSuffix)) {
+                                    version = version.concat(versionSuffix);
+                                    getLog().info("Change version to: " + version);
                                     changeInPlist = true;
                                     properties.put(BUNDLE_VERSION_KEY, version);
                                 }
