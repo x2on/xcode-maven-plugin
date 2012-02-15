@@ -34,8 +34,8 @@ import java.util.regex.Pattern;
  * @goal ghunittest
  * @phase test
  * @see <a href="https://github.com/Fingertips/ios-sim">ios-sim</a>
- * @see <a href="https://github.com/gabriel/gh-unit>GHUnit</a>
- * @see <a href="https://github.com/Scout24-CoC-MPS/gh-unit/network>GHUnit with TeamCity Extension</a>
+ * @see <a href="https://github.com/gabriel/gh-unit">GHUnit</a>
+ * @see <a href="https://github.com/Scout24-CoC-MPS/gh-unit/network">GHUnit with TeamCity Extension</a>
  * @author <a href="mail@felixschulze.de">Felix Schulze</a>
  */
 public class GHUnitTestMojo extends AbstractXcodeMojo {
