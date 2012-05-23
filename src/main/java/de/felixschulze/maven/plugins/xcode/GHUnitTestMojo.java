@@ -18,11 +18,14 @@ package de.felixschulze.maven.plugins.xcode;
 
 import de.felixschulze.maven.plugins.xcode.helper.ProcessHelper;
 import de.felixschulze.maven.plugins.xcode.helper.TeamCityHelper;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -81,7 +84,9 @@ public class GHUnitTestMojo extends AbstractXcodeMojo {
 
             if (teamCityLog) {
                 commands.add("--setenv");
-                commands.add("TEAMCITY_LOG=YES");
+                commands.add("GHUNIT_AUTORUN=1");
+                commands.add("--setenv");
+                commands.add("WRITE_JUNIT_XML=1");
             }
 
             try {
@@ -111,6 +116,40 @@ public class GHUnitTestMojo extends AbstractXcodeMojo {
             } catch (ExecutionException e) {
                 throw new MojoExecutionException("Error while executing: ", e);
             }
+
+            //Test results
+            try {
+                commands = new ArrayList<String>();
+                commands.add("DARWIN_USER_TEMP_DIR");
+                executor.executeCommand("/usr/bin/getconf", commands, false, true);
+                final String standardOut = executor.getStandardOut();
+
+                final String testResultsPathString = standardOut + "test-results";
+                File testResultsPath = new File(testResultsPathString);
+                if(!testResultsPath.isDirectory()) {
+                    throw new MojoExecutionException("Tests failed - No test results at "+testResultsPath.getAbsolutePath());
+                }
+                File testResultsDirectory = new File(buildDirectory, "test-results");
+                FileUtils.copyDirectory(testResultsPath, testResultsDirectory, new SuffixFileFilter(".xml"));
+                FileUtils.deleteDirectory(testResultsPath);
+
+                if (teamCityLog) {
+                    String[] extension = {"xml"};
+                    Iterator<File> fileIterator = FileUtils.iterateFiles(testResultsDirectory, extension, true);
+                    while (fileIterator.hasNext()) {
+                        File testXml = fileIterator.next();
+                        getLog().info("##teamcity[importData type='junit' path='"+testXml.getAbsolutePath()+"']");
+                    }
+
+                }
+
+            } catch (ExecutionException e) {
+                throw new MojoExecutionException("Error while executing: ", e);
+            }
+            catch (IOException e) {
+                throw new MojoExecutionException("Error while executing: ", e);
+            }
+
 
             //Coverage
             if (generateCoverageReport) {
