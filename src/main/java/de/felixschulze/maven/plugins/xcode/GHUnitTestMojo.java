@@ -63,6 +63,7 @@ public class GHUnitTestMojo extends AbstractXcodeMojo {
             }
 
             File appDirectory = new File(buildDirectory, xcodeConfiguration + "-iphonesimulator");
+            File testResultsDirectory = new File(buildDirectory, "test-results");
 
             File appFile = new File(appDirectory, appName + ".app");
 
@@ -87,6 +88,8 @@ public class GHUnitTestMojo extends AbstractXcodeMojo {
                 commands.add("GHUNIT_AUTORUN=1");
                 commands.add("--setenv");
                 commands.add("WRITE_JUNIT_XML=1");
+                commands.add("--setenv");
+                commands.add("JUNIT_XML_DIR="+testResultsDirectory.getAbsolutePath());
             }
 
             try {
@@ -118,36 +121,15 @@ public class GHUnitTestMojo extends AbstractXcodeMojo {
             }
 
             //Test results
-            try {
-                commands = new ArrayList<String>();
-                commands.add("DARWIN_USER_TEMP_DIR");
-                executor.executeCommand("/usr/bin/getconf", commands, false, true);
-                final String standardOut = executor.getStandardOut();
 
-                final String testResultsPathString = standardOut + "test-results";
-                File testResultsPath = new File(testResultsPathString);
-                if(!testResultsPath.isDirectory()) {
-                    throw new MojoExecutionException("Tests failed - No test results at "+testResultsPath.getAbsolutePath());
-                }
-                File testResultsDirectory = new File(buildDirectory, "test-results");
-                FileUtils.copyDirectory(testResultsPath, testResultsDirectory, new SuffixFileFilter(".xml"));
-                FileUtils.deleteDirectory(testResultsPath);
-
-                if (teamCityLog) {
-                    String[] extension = {"xml"};
-                    Iterator<File> fileIterator = FileUtils.iterateFiles(testResultsDirectory, extension, true);
-                    while (fileIterator.hasNext()) {
-                        File testXml = fileIterator.next();
-                        getLog().info("##teamcity[importData type='junit' path='"+testXml.getAbsolutePath()+"']");
-                    }
-
+            if (teamCityLog) {
+                String[] extension = {"xml"};
+                Iterator<File> fileIterator = FileUtils.iterateFiles(testResultsDirectory, extension, true);
+                while (fileIterator.hasNext()) {
+                    File testXml = fileIterator.next();
+                    getLog().info("##teamcity[importData type='junit' path='" + testXml.getAbsolutePath() + "']");
                 }
 
-            } catch (ExecutionException e) {
-                throw new MojoExecutionException("Error while executing: ", e);
-            }
-            catch (IOException e) {
-                throw new MojoExecutionException("Error while executing: ", e);
             }
 
 
