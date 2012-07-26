@@ -173,6 +173,10 @@ public class GHUnitTestMojo extends AbstractXcodeMojo {
 
                 File coverageOutPutFile = new File(buildDirectory, "main.info");
                 commands.add(coverageOutPutFile.getAbsolutePath());
+
+                commands.add("-b");
+                commands.add(basedir);
+
                 File coverageTargetOutPutFile = new File(buildDirectory, appName + ".info");
 
                 getLog().info(lcovCommandLine.getAbsolutePath() + " " + commands.toString());
