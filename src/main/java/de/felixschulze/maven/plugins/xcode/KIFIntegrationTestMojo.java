@@ -34,6 +34,7 @@ import java.util.regex.Pattern;
  * @phase test
  * @see <a href="https://github.com/Fingertips/ios-sim">ios-sim</a>
  * @see <a href="https://github.com/square/KIF">KIF</a>
+ * @see <a href="https://github.com/x2on/KIF">KIF with TeamCity integration</a>
  * @author <a href="mail@felixschulze.de">Felix Schulze</a>
  */
 
@@ -94,6 +95,16 @@ public class KIFIntegrationTestMojo extends AbstractXcodeMojo {
                 getLog().info(iosSimCommandLine.getAbsolutePath() + " " + commands.toString());
                 executor.executeCommand(iosSimCommandLine.getAbsolutePath(), commands, false, true);
                 final String errorOut = executor.getStandardError();
+
+                String regexSimulatorTimeOut = ".*Simulator session timed out.(.*)";
+                Boolean sessionTimedOut = Pattern.compile(regexSimulatorTimeOut, Pattern.DOTALL).matcher(errorOut).matches();
+                if (sessionTimedOut) {
+                    if (teamCityLog) {
+                        getLog().error("##teamcity[buildStatus status='FAILURE' text='Simulator session timed out.']");
+                    }
+                    getLog().error("Simulator session timed out.");
+                    throw new MojoExecutionException("Simulator session timed out.");
+                }
 
             } catch (ExecutionException e) {
                 throw new MojoExecutionException("Error while executing: ", e);

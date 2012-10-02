@@ -36,9 +36,8 @@ import java.util.regex.Pattern;
  *
  * @goal ghunittest
  * @phase test
- * @see <a href="https://github.com/Fingertips/ios-sim">ios-sim</a>
+ * @see <a href="https://github.com/phonegap/ios-sim">ios-sim</a>
  * @see <a href="https://github.com/gabriel/gh-unit">GHUnit</a>
- * @see <a href="https://github.com/Scout24-CoC-MPS/gh-unit/network">GHUnit with TeamCity Extension</a>
  * @author <a href="mail@felixschulze.de">Felix Schulze</a>
  */
 public class GHUnitTestMojo extends AbstractXcodeMojo {
@@ -104,11 +103,18 @@ public class GHUnitTestMojo extends AbstractXcodeMojo {
                 executor.executeCommand(iosSimCommandLine.getAbsolutePath(), commands, false, true);
                 final String errorOut = executor.getStandardError();
 
-                String regex = ".*Executed [0-9]* of [0-9]* tests, with [0-9]* failures in [0-9]*.[0-9]* seconds(.*)";
-                Pattern pattern = Pattern.compile(regex, Pattern.DOTALL);
-                Matcher matcher = pattern.matcher(errorOut);
-                Boolean success = matcher.matches();
+                String regexSimulatorTimeOut = ".*Simulator session timed out.(.*)";
+                Boolean sessionTimedOut = Pattern.compile(regexSimulatorTimeOut, Pattern.DOTALL).matcher(errorOut).matches();
+                if (sessionTimedOut) {
+                    if (teamCityLog) {
+                        getLog().error("##teamcity[buildStatus status='FAILURE' text='Simulator session timed out.']");
+                    }
+                    getLog().error("Simulator session timed out.");
+                    throw new MojoExecutionException("Simulator session timed out.");
+                }
 
+                String regex = ".*Executed [0-9]* of [0-9]* tests, with [0-9]* failures in [0-9]*.[0-9]* seconds(.*)";
+                Boolean success = Pattern.compile(regex, Pattern.DOTALL).matcher(errorOut).matches();
                 if (!success) {
                     if (teamCityLog) {
                         getLog().error("##teamcity[buildStatus status='FAILURE' text='Tests failed - The app may be crashed']");
@@ -121,7 +127,6 @@ public class GHUnitTestMojo extends AbstractXcodeMojo {
             }
 
             //Test results
-
             if (teamCityLog) {
                 String[] extension = {"xml"};
                 Iterator<File> fileIterator = FileUtils.iterateFiles(testResultsDirectory, extension, true);
