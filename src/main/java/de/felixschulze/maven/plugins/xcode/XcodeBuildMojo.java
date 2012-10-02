@@ -26,7 +26,7 @@ import de.felixschulze.maven.plugins.xcode.xcodeprojparser.PBXProject;
 import de.felixschulze.maven.plugins.xcode.xcodeprojparser.XCBuildConfiguration;
 import de.felixschulze.maven.plugins.xcode.xcodeprojparser.XcodeprojParser;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.eclipse.jgit.api.errors.NoHeadException;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.json.JSONException;
 import xmlwise.Plist;
 import xmlwise.XmlParseException;
@@ -147,7 +147,7 @@ public class XcodeBuildMojo extends AbstractXcodeMojo {
         }
 
         if (infoPlist != null) {
-            changesValuesInPlist(executor);
+            changesValuesInPlist();
         }
 
         getLog().info(xcodeCommandLine.getAbsolutePath() + " " + commands.toString());
@@ -183,7 +183,7 @@ public class XcodeBuildMojo extends AbstractXcodeMojo {
 
     }
 
-    private void changesValuesInPlist(CommandExecutor executor) {
+    private void changesValuesInPlist() {
         try {
             Map<String, Object> properties = Plist.load(infoPlist);
 
@@ -238,7 +238,7 @@ public class XcodeBuildMojo extends AbstractXcodeMojo {
                                 }
                             }
                         }
-                    } catch (NoHeadException e) {
+                    } catch (GitAPIException e) {
                         getLog().warn("Error while getting version number from git: " + e);
                     }
                 }

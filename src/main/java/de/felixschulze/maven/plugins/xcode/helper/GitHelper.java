@@ -17,6 +17,7 @@
 package de.felixschulze.maven.plugins.xcode.helper;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoHeadException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
@@ -42,7 +43,7 @@ public class GitHelper {
         repository = builder.setGitDir(gitDir).readEnvironment().findGitDir().build();
     }
 
-    public int numberOfCommits() throws NoHeadException {
+    public int numberOfCommits() throws GitAPIException {
         Git git = new Git(repository);
         Iterable<RevCommit> logs = git.log().call();
         Iterator<RevCommit> i = logs.iterator();
