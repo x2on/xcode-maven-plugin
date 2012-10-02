@@ -17,6 +17,7 @@
 package de.felixschulze.maven.plugins.xcode;
 
 import de.felixschulze.maven.plugins.xcode.helper.ProcessHelper;
+import de.felixschulze.maven.plugins.xcode.helper.TeamCityHelper;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
@@ -100,7 +101,7 @@ public class KIFIntegrationTestMojo extends AbstractXcodeMojo {
                 Boolean sessionTimedOut = Pattern.compile(regexSimulatorTimeOut, Pattern.DOTALL).matcher(errorOut).matches();
                 if (sessionTimedOut) {
                     if (teamCityLog) {
-                        getLog().error("##teamcity[buildStatus status='FAILURE' text='Simulator session timed out.']");
+                        getLog().error(TeamCityHelper.createBuildStatusFailureLog("Simulator session timed out."));
                     }
                     getLog().error("Simulator session timed out.");
                     throw new MojoExecutionException("Simulator session timed out.");

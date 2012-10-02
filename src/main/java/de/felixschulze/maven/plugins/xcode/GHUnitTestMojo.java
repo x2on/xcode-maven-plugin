@@ -19,7 +19,6 @@ package de.felixschulze.maven.plugins.xcode;
 import de.felixschulze.maven.plugins.xcode.helper.ProcessHelper;
 import de.felixschulze.maven.plugins.xcode.helper.TeamCityHelper;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;
@@ -107,7 +106,7 @@ public class GHUnitTestMojo extends AbstractXcodeMojo {
                 Boolean sessionTimedOut = Pattern.compile(regexSimulatorTimeOut, Pattern.DOTALL).matcher(errorOut).matches();
                 if (sessionTimedOut) {
                     if (teamCityLog) {
-                        getLog().error("##teamcity[buildStatus status='FAILURE' text='Simulator session timed out.']");
+                        getLog().error(TeamCityHelper.createBuildStatusFailureLog("Simulator session timed out."));
                     }
                     getLog().error("Simulator session timed out.");
                     throw new MojoExecutionException("Simulator session timed out.");
@@ -117,7 +116,7 @@ public class GHUnitTestMojo extends AbstractXcodeMojo {
                 Boolean success = Pattern.compile(regex, Pattern.DOTALL).matcher(errorOut).matches();
                 if (!success) {
                     if (teamCityLog) {
-                        getLog().error("##teamcity[buildStatus status='FAILURE' text='Tests failed - The app may be crashed']");
+                        getLog().error(TeamCityHelper.createBuildStatusFailureLog("Tests failed - The app may be crashed"));
                     }
                     getLog().error("Tests failed - The app may be crashed");
                     throw new MojoExecutionException("Tests failed - The app may be crashed");

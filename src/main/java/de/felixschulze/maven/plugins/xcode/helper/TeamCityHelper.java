@@ -36,6 +36,9 @@ public class TeamCityHelper {
     
     public static String createVersionLog(String version) {
         return "##teamcity[buildNumber '"+TeamCityHelper.escapeString(version)+"']";
+    }
 
+    public static String createBuildStatusFailureLog(String text) {
+        return "##teamcity[buildStatus status='FAILURE' text='"+TeamCityHelper.escapeString(text)+"']";
     }
 }

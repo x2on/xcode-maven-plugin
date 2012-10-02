@@ -34,4 +34,10 @@ public class TeamCityHelperTest {
         assertEquals("##teamcity[buildNumber '3.7']", versionLog);
     }
 
+    @Test
+    public void testShouldCreateBuildStatusFailureLog() {
+        String buildStatusFailureLog = TeamCityHelper.createBuildStatusFailureLog("Tests failed - The app may be crashed");
+        assertEquals("##teamcity[buildStatus status='FAILURE' text='Tests failed - The app may be crashed']", buildStatusFailureLog);
+    }
+
 }
