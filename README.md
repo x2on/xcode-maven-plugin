@@ -12,7 +12,7 @@ A maven plugin for building iOS Apps, run unit-tests and integration-tests.
 
 ## Requirements on your build agent
 
-- XCode
+- Xcode command line tools
 - Homebrew: ```ruby -e "$(curl -fsSkL raw.github.com/mxcl/homebrew/go)"```
 - lcov: ```brew install lcov```
 - ios-sim: ```brew install ios-sim```
