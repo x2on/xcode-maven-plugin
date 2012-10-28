@@ -16,6 +16,9 @@
 
 package de.felixschulze.maven.plugins.xcode.helper;
 
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -48,5 +51,14 @@ public class ProcessHelper {
     public static void killSimulatorProcess() throws IOException {
         String[] commands = new String[]{"/bin/sh", "-c", KILL};
         Runtime.getRuntime().exec(commands);
+    }
+
+    public static void killSimulatorProcess(Log log) throws MojoExecutionException {
+        try {
+            log.info("Shutdown iPhone Simulator.");
+            ProcessHelper.killSimulatorProcess();
+        } catch (IOException e) {
+            throw new MojoExecutionException("Error while shutdown simulator: ", e);
+        }
     }
 }

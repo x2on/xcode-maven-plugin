@@ -85,12 +85,8 @@ public class KIFIntegrationTestMojo extends AbstractXcodeMojo {
                 commands.add("--setenv");
                 commands.add("KIF_AUTOEXIT=YES");
             }
-            try {
-                getLog().info("Shutdown iPhone Simulator.");
-                ProcessHelper.killSimulatorProcess();
-            } catch (IOException e) {
-                throw new MojoExecutionException("Error while shutdown simulator: ", e);
-            }
+
+            ProcessHelper.killSimulatorProcess(getLog());
 
             try {
                 getLog().info(iosSimCommandLine.getAbsolutePath() + " " + commands.toString());

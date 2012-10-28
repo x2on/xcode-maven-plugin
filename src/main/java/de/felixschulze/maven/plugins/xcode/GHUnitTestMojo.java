@@ -94,12 +94,7 @@ public class GHUnitTestMojo extends AbstractXcodeMojo {
                 commands.add("--retina");
             }
 
-            try {
-                getLog().info("Shutdown iPhone Simulator.");
-                ProcessHelper.killSimulatorProcess();
-            } catch (IOException e) {
-                throw new MojoExecutionException("Error while shutdown simulator: ", e);
-            }
+            ProcessHelper.killSimulatorProcess(getLog());
 
             try {
                 getLog().info(iosSimCommandLine.getAbsolutePath() + " " + commands.toString());
@@ -235,12 +230,8 @@ public class GHUnitTestMojo extends AbstractXcodeMojo {
                     throw new MojoExecutionException("Error while executing genhtml: ", e);
                 }
             }
-            try {
-                getLog().info("Shutdown iPhone Simulator.");
-                ProcessHelper.killSimulatorProcess();
-            } catch (IOException e) {
-                throw new MojoExecutionException("Error while shutdown simulator: ", e);
-            }
+            ProcessHelper.killSimulatorProcess(getLog());
+
         } else {
             getLog().info("Skipping GHUnit-Tests.");
         }
