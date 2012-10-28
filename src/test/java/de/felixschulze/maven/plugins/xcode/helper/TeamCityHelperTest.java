@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import de.felixschulze.maven.plugins.xcode.helper.TeamCityHelper;
-import org.junit.Test;
+package de.felixschulze.maven.plugins.xcode.helper;
 
+import org.junit.Test;
 import static junit.framework.Assert.assertEquals;
 
 public class TeamCityHelperTest {
