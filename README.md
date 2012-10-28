@@ -3,6 +3,8 @@
 ## Overview
 A maven plugin for building iOS Apps, run unit-tests and integration-tests.
 
+[![Build Status](https://secure.travis-ci.org/x2on/xcode-maven-plugin.png)](http://travis-ci.org/x2on/xcode-maven-plugin)
+
 ## Requirements on your xcode project
 
 - Unit-Tests: GH-Unit: https://github.com/gabriel/gh-unit
