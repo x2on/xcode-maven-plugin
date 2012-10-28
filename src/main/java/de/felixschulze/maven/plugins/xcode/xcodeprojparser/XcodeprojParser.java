@@ -52,15 +52,14 @@ public class XcodeprojParser {
             }
         }
         if (targets != null) {
-            PBXProject project = new PBXProject(targets);
-            return project;
+            return new PBXProject(targets);
         }
         return null;
     }
 
     private List<String> getTargetRefs(JSONObject json) throws JSONException {
         JSONArray array = json.getJSONArray("targets");
-        List<String> targetRefs = new ArrayList();
+        List<String> targetRefs = new ArrayList<String>();
         for (int i = 0; i < array.length(); i++) {
             targetRefs.add(array.getString(i));
         }
@@ -68,7 +67,7 @@ public class XcodeprojParser {
     }
 
     private List<PBXNativeTarget> getTargetsFromRefs(List<String> targetRefs, JSONObject json, JSONObject projectJson) throws JSONException {
-        List<PBXNativeTarget> pbxNativeTargets = new ArrayList();
+        List<PBXNativeTarget> pbxNativeTargets = new ArrayList<PBXNativeTarget>();
 
         for (String id : targetRefs) {
             JSONObject targetObject = json.getJSONObject(id);
@@ -95,7 +94,7 @@ public class XcodeprojParser {
     }
 
     public List<XCBuildConfiguration> getBuildConfigurations(JSONObject jsonObject, String buildConfigurationList) throws JSONException {
-        List<XCBuildConfiguration> buildConfigurationstmp = new ArrayList<XCBuildConfiguration>();
+        List<XCBuildConfiguration> buildConfigurations = new ArrayList<XCBuildConfiguration>();
         JSONObject buildConfigurationListIdJson = jsonObject.getJSONObject(buildConfigurationList);
 
         if (buildConfigurationListIdJson.has("isa")) {
@@ -115,11 +114,11 @@ public class XcodeprojParser {
                         String infoPlistString = buildSettings.getString("INFOPLIST_FILE");
                         buildConfiguration.setInfoPlist(new File(infoPlistString));
                     }
-                    buildConfigurationstmp.add(buildConfiguration);
+                    buildConfigurations.add(buildConfiguration);
                 }
             }
 
         }
-        return buildConfigurationstmp;
+        return buildConfigurations;
     }
 }
