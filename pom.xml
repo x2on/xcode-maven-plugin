@@ -73,7 +73,11 @@
             <artifactId>json</artifactId>
             <version>20090911</version>
         </dependency>
-
+        <dependency>
+            <groupId>xmlwise</groupId>
+            <artifactId>xmlwise</artifactId>
+            <version>1.2.11</version>
+        </dependency>
         <!-- Test -->
         <dependency>
             <groupId>junit</groupId>
