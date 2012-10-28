@@ -3,6 +3,18 @@
 ## Overview
 A maven plugin for building iOS Apps, run unit-tests and integration-tests.
 
+## Requirements on your xcode project
+
+- Unit-Tests: GH-Unit: https://github.com/gabriel/gh-unit
+- Integration-Tests: KIF: https://github.com/square/KIF
+
+## Requirements on your build agent
+
+- XCode
+- Homebrew: ```ruby -e "$(curl -fsSkL raw.github.com/mxcl/homebrew/go)"```
+- lcov: ```brew install lcov```
+- ios-sim: ```brew install ios-sim```
+
 ## Example POM
 ```xml
 <project>
