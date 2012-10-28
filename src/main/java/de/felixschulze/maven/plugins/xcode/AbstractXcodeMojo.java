@@ -162,6 +162,13 @@ public abstract class AbstractXcodeMojo extends AbstractMojo {
     protected String testDevice;
 
     /**
+     * Should test device started as retina
+     *
+     * @parameter default-value="False"
+     */
+    protected Boolean retinaDevice;
+
+    /**
      * App Name
      *
      * @parameter default-value="False"

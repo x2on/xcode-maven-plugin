@@ -90,6 +90,10 @@ public class GHUnitTestMojo extends AbstractXcodeMojo {
                 commands.add("JUNIT_XML_DIR="+testResultsDirectory.getAbsolutePath());
             }
 
+            if (retinaDevice) {
+                commands.add("--retina");
+            }
+
             try {
                 getLog().info("Shutdown iPhone Simulator.");
                 ProcessHelper.killSimulatorProcess();
