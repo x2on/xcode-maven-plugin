@@ -87,7 +87,7 @@ public class GHUnitTestMojo extends AbstractXcodeMojo {
                 commands.add("--setenv");
                 commands.add("WRITE_JUNIT_XML=1");
                 commands.add("--setenv");
-                commands.add("JUNIT_XML_DIR="+testResultsDirectory.getAbsolutePath());
+                commands.add("JUNIT_XML_DIR=" + testResultsDirectory.getAbsolutePath());
             }
 
             if (retinaDevice) {
@@ -140,7 +140,6 @@ public class GHUnitTestMojo extends AbstractXcodeMojo {
 
             }
 
-
             //Coverage
             if (generateCoverageReport) {
 
@@ -152,7 +151,6 @@ public class GHUnitTestMojo extends AbstractXcodeMojo {
                 }
 
                 commands = new ArrayList<String>();
-
                 commands.add("--directory");
 
                 File coverageObjectsDir = buildDirectory;
@@ -160,8 +158,7 @@ public class GHUnitTestMojo extends AbstractXcodeMojo {
                 String buildFolderName;
                 if (coverageAppName != null) {
                     buildFolderName = coverageAppName + ".build";
-                }
-                else {
+                } else {
                     buildFolderName = appName + ".build";
                 }
                 String[] directoryStructure = {
@@ -171,7 +168,7 @@ public class GHUnitTestMojo extends AbstractXcodeMojo {
                         "Objects-normal",
                         "i386"
                 };
-                for (String currentDir:directoryStructure) {
+                for (String currentDir : directoryStructure) {
                     coverageObjectsDir = new File(coverageObjectsDir.getAbsolutePath(), currentDir);
                 }
 
@@ -198,7 +195,7 @@ public class GHUnitTestMojo extends AbstractXcodeMojo {
 
                     commands.add("--extract");
                     commands.add(coverageOutPutFile.getAbsolutePath());
-                    commands.add("'*"+coverageTarget+"/*'");
+                    commands.add("'*" + coverageTarget + "/*'");
 
                     getLog().info(lcovCommandLine.getAbsolutePath() + " " + commands.toString());
                     executor.executeCommand(lcovCommandLine.getAbsolutePath(), commands, false);
@@ -237,13 +234,12 @@ public class GHUnitTestMojo extends AbstractXcodeMojo {
                 } catch (ExecutionException e) {
                     throw new MojoExecutionException("Error while executing genhtml: ", e);
                 }
-
-                try {
-                    getLog().info("Shutdown iPhone Simulator.");
-                    ProcessHelper.killSimulatorProcess();
-                } catch (IOException e) {
-                    throw new MojoExecutionException("Error while shutdown simulator: ", e);
-                }
+            }
+            try {
+                getLog().info("Shutdown iPhone Simulator.");
+                ProcessHelper.killSimulatorProcess();
+            } catch (IOException e) {
+                throw new MojoExecutionException("Error while shutdown simulator: ", e);
             }
         } else {
             getLog().info("Skipping GHUnit-Tests.");
