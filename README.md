@@ -31,7 +31,7 @@ A maven plugin for building iOS Apps, run unit-tests and integration-tests.
             <plugin>
                 <groupId>de.felixschulze.maven.plugins.xcode</groupId>
                 <artifactId>xcode-maven-plugin</artifactId>
-                <version>1.1</version>
+                <version>1.1.1</version>
                 <configuration>
                     <xcodeProject>my-project.xcodeproj</xcodeProject>
                     <xcodeTarget>my-project</xcodeTarget>
@@ -59,7 +59,7 @@ A maven plugin for building iOS Apps, run unit-tests and integration-tests.
             <plugin>
                 <groupId>de.felixschulze.maven.plugins.xcode</groupId>
                 <artifactId>xcode-maven-plugin</artifactId>
-                <version>1.1</version>
+                <version>1.1.1</version>
                 <configuration>
                     <xcodeProject>my-project.xcodeproj</xcodeProject>
                     <xcodeTarget>my-project</xcodeTarget>
