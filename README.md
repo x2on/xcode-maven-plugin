@@ -20,6 +20,9 @@ A maven plugin for building iOS Apps, run unit-tests and integration-tests.
 - lcov: ```brew install lcov```
 - ios-sim: ```brew install ios-sim```
 
+## Example Project
+[iOS-Continuous-Integration-Demo](https://github.com/ImmobilienScout24/iOS-Continuous-Integration-Demo)
+
 ## Example POM
 ```xml
 <project>
