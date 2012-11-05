@@ -103,6 +103,16 @@ public class KIFIntegrationTestMojo extends AbstractXcodeMojo {
                     throw new MojoExecutionException("Simulator session timed out.");
                 }
 
+                String regex = ".*\\*\\*\\* KIF TESTING FINISHED: ([0-9])* failures(.*)";
+                Boolean success = Pattern.compile(regex, Pattern.DOTALL).matcher(errorOut).matches();
+                if (!success) {
+                    if (teamCityLog) {
+                        getLog().error(TeamCityHelper.createBuildStatusFailureLog("Tests failed - The app may be crashed"));
+                    }
+                    getLog().error("Tests failed - The app may be crashed");
+                    throw new MojoExecutionException("Tests failed - The app may be crashed");
+                }
+
             } catch (ExecutionException e) {
                 throw new MojoExecutionException("Error while executing: ", e);
             }
