@@ -16,6 +16,7 @@
 
 package de.felixschulze.maven.plugins.xcode;
 
+import de.felixschulze.maven.plugins.xcode.helper.FolderHelper;
 import de.felixschulze.maven.plugins.xcode.helper.ProcessHelper;
 import de.felixschulze.maven.plugins.xcode.helper.TeamCityHelper;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -47,6 +48,14 @@ public class KIFIntegrationTestMojo extends AbstractXcodeMojo {
      * @parameter default-value="False"
      */
     protected Boolean executeKIFIntegrationTests;
+
+    /**
+     * Make Screenshots on error
+     *
+     *
+     * @parameter default-value="False"
+     */
+    protected Boolean kifMakeScreenshots;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -84,6 +93,14 @@ public class KIFIntegrationTestMojo extends AbstractXcodeMojo {
             if (!testNoAutoExit) {
                 commands.add("--setenv");
                 commands.add("KIF_AUTOEXIT=YES");
+            }
+
+            if (kifMakeScreenshots) {
+                commands.add("--setenv");
+                File artifactsDir = FolderHelper.getAndCreateArtifactsDir(buildDirectory);
+                File screenshotsDir = new File(artifactsDir, "screenshots");
+                screenshotsDir.mkdir();
+                commands.add("KIF_SCREENSHOTS="+screenshotsDir.getAbsolutePath());
             }
 
             ProcessHelper.killSimulatorProcess(getLog());
