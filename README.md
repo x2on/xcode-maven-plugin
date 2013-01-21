@@ -80,6 +80,8 @@ A maven plugin for building iOS Apps, run unit-tests and integration-tests.
                     <infoPlist>my-project/my-project-Info.plist</infoPlist>
                     <provisioningProfile>ABCDEFGH-ABCD-1234-ABCD-12345678901</provisioningProfile>
                     <codeSignIdentity>iPhone Distribution: Developer Name</codeSignIdentity>
+                    <executeKIFIntegrationTests>true</executeKIFIntegrationTests>
+                    <kifMakeScreenshots>true</kifMakeScreenshots>
                 </configuration>
                 <extensions>true</extensions>
             </plugin>
