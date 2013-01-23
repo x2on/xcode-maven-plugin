@@ -101,7 +101,7 @@ public class XcodeBuildMojo extends AbstractXcodeMojo {
                                     if (buildConfiguration.getName().equalsIgnoreCase(xcodeConfiguration)) {
                                         getLog().info("==== XCBuildConfiguration ====");
                                         getLog().info(" Name: " + buildConfiguration.getName());
-                                        getLog().info(" InfoPlist: " + buildConfiguration.getInfoPlist().getPath());
+                                        getLog().info(" InfoPlist: " + buildConfiguration.getInfoPlist());
                                     }
                                 }
                             }
