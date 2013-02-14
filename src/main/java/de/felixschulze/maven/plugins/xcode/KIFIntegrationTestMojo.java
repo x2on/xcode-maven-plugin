@@ -57,6 +57,14 @@ public class KIFIntegrationTestMojo extends AbstractXcodeMojo {
      */
     protected Boolean kifMakeScreenshots;
 
+    /**
+     * Exit on the first failing scenario
+     *
+     *
+     * @parameter default-value="False"
+     */
+    protected Boolean kifExitOnFailure;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (executeKIFIntegrationTests) {
@@ -93,6 +101,10 @@ public class KIFIntegrationTestMojo extends AbstractXcodeMojo {
             if (!testNoAutoExit) {
                 commands.add("--setenv");
                 commands.add("KIF_AUTOEXIT=YES");
+            }
+            if (kifExitOnFailure) {
+                commands.add("--setenv");
+                commands.add("KIF_EXIT_ON_FAILURE=YES");
             }
 
             if (kifMakeScreenshots) {
