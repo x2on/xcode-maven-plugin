@@ -56,12 +56,12 @@
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
-            <version>3.0.8</version>
+            <version>3.0.10</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit</artifactId>
-            <version>2.1.0.201209190230-r</version>
+            <version>2.2.0.201212191850-r</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -82,7 +82,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.10</version>
+            <version>4.11</version>
             <scope>test</scope>
         </dependency>
 
