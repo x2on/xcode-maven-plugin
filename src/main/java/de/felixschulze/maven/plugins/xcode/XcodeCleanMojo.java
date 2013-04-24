@@ -16,26 +16,26 @@
 
 package de.felixschulze.maven.plugins.xcode;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.felixschulze.maven.plugins.xcode.AbstractXcodeMojo;
-import de.felixschulze.maven.plugins.xcode.CommandExecutor;
-import de.felixschulze.maven.plugins.xcode.ExecutionException;
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * Run the xcodebuild-clean command line program
+ *
+ * @author <a href="mail@felixschulze.de">Felix Schulze</a>
  * @goal xcodebuild-clean
  * @phase clean
- * @author <a href="mail@felixschulze.de">Felix Schulze</a>
  */
 public class XcodeCleanMojo extends AbstractXcodeMojo {
 
-	/**
-	 * Execute the xcode command line utility.
-	 */
-	public void execute() throws MojoExecutionException {
+    /**
+     * Execute the xcode command line utility.
+     */
+    public void execute() throws MojoExecutionException {
         if (!xcodeCommandLine.exists()) {
             throw new MojoExecutionException("Invalid path for xcodebuild: " + xcodeCommandLine.getAbsolutePath());
         }
@@ -58,7 +58,6 @@ public class XcodeCleanMojo extends AbstractXcodeMojo {
             commands.add(xcodeConfiguration);
         }
 
-
         getLog().info(xcodeCommandLine.getAbsolutePath() + " " + commands.toString());
 
         try {
@@ -68,5 +67,14 @@ public class XcodeCleanMojo extends AbstractXcodeMojo {
             getLog().error(executor.getStandardError());
             throw new MojoExecutionException("Error while executing: ", e);
         }
-	}
+
+        try {
+            getLog().info("Deleting " + buildDirectory);
+            FileUtils.deleteDirectory(buildDirectory);
+        } catch (IOException e) {
+            getLog().error("Failed to delete build directory.");
+            throw new MojoExecutionException("Error while deleting build directory: ", e);
+        }
+
+    }
 }
