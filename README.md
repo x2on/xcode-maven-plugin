@@ -7,6 +7,7 @@ A maven plugin for building iOS Apps, run unit-tests and integration-tests.
 
 ## Documentation
 [Documentation](http://x2on.de/xcode-maven-plugin/)
+
 [Wiki](https://github.com/x2on/xcode-maven-plugin/wiki)
 
 ## Requirements on your xcode project
