@@ -31,6 +31,10 @@
       <tag>HEAD</tag>
   </scm>
 
+    <properties>
+        <org.apache.maven.version>3.0.5</org.apache.maven.version>
+    </properties>
+
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
@@ -41,17 +45,17 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-core</artifactId>
-            <version>3.0.5</version>
+            <version>${org.apache.maven.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-model</artifactId>
-            <version>3.0.5</version>
+            <version>${org.apache.maven.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
-            <version>3.0.5</version>
+            <version>${org.apache.maven.version}</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
