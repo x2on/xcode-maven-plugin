@@ -78,6 +78,20 @@ public abstract class AbstractXcodeMojo extends AbstractMojo {
     protected File xcodeProject;
 
     /**
+     * Workspace Name
+     *
+     * @parameter
+     */
+    protected File xcodeWorkspace;
+
+    /**
+     * Scheme Name
+     *
+     * @parameter
+     */
+    protected String xcodeScheme;
+
+    /**
      * Target to be built
      *
      * @parameter

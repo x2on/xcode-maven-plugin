@@ -57,6 +57,14 @@ public class XcodeCleanMojo extends AbstractXcodeMojo {
             commands.add("-configuration");
             commands.add(xcodeConfiguration);
         }
+        if (xcodeWorkspace != null) {
+            commands.add("-workspace");
+            commands.add(xcodeWorkspace.getAbsolutePath());
+        }
+        if (xcodeScheme != null) {
+            commands.add("-scheme");
+            commands.add(xcodeScheme);
+        }
 
         getLog().info(xcodeCommandLine.getAbsolutePath() + " " + commands.toString());
 

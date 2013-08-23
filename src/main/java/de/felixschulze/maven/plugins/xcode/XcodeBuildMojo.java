@@ -64,62 +64,6 @@ public class XcodeBuildMojo extends AbstractXcodeMojo {
         executor.setLogger(this.getLog());
         List<String> commands = new ArrayList<String>();
 
-        //Parse XCode project (only for testing)
-        if (xcodeProject != null) {
-            if (!plutilCommandLine.exists()) {
-                throw new MojoExecutionException("Invalid path for plutil: " + plutilCommandLine.getAbsolutePath());
-            }
-
-            File xcodeprojJson = new File(buildDirectory, xcodeProject.getName() + ".json");
-            commands.add("-convert");
-            commands.add("json");
-            commands.add("-o");
-            commands.add(xcodeprojJson.getAbsolutePath());
-            commands.add(xcodeProject.getAbsolutePath() + "/project.pbxproj");
-            getLog().info(plutilCommandLine.getAbsolutePath() + " " + commands.toString());
-
-            try {
-                executor.executeCommand(plutilCommandLine.getAbsolutePath(), commands, false);
-            } catch (ExecutionException e) {
-                throw new MojoExecutionException("Error while executing: ", e);
-            }
-
-            if (xcodeprojJson.exists()) {
-                XcodeprojParser parser = new XcodeprojParser(xcodeprojJson);
-                try {
-                    PBXProject project = parser.parseXcodeFile();
-                    if (project != null) {
-                        for (PBXNativeTarget target : project.getTargets()) {
-                            if (target.getName().equalsIgnoreCase(xcodeTarget)) {
-                                getLog().info("=== PBXNativeTarget ===");
-                                getLog().info(" Target-Name: " + target.getName());
-                                getLog().info(" App-Name: " + target.getAppName());
-                                getLog().info(" Product-Name: " + target.getProductName());
-                                getLog().info(" Type: " + target.getType());
-
-                                for (XCBuildConfiguration buildConfiguration : target.getBuildConfigurations()) {
-                                    if (buildConfiguration.getName().equalsIgnoreCase(xcodeConfiguration)) {
-                                        getLog().info("==== XCBuildConfiguration ====");
-                                        getLog().info(" Name: " + buildConfiguration.getName());
-                                        File infoPlist = buildConfiguration.getInfoPlist();
-                                        if (infoPlist != null) {
-                                            if (infoPlist.exists()) {
-                                                getLog().info(" InfoPlist: " + buildConfiguration.getInfoPlist().getAbsolutePath());
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                } catch (IOException e) {
-                    throw new MojoExecutionException("Error while executing: ", e);
-                } catch (JSONException e) {
-                    throw new MojoExecutionException("Error while executing: ", e);
-                }
-            }
-        }
-
         commands = new ArrayList<String>();
 
         if (xcodeProject != null) {
@@ -134,11 +78,21 @@ public class XcodeBuildMojo extends AbstractXcodeMojo {
             commands.add("-configuration");
             commands.add(xcodeConfiguration);
         }
-
+        if (xcodeWorkspace != null) {
+            commands.add("-workspace");
+            commands.add(xcodeWorkspace.getAbsolutePath());
+        }
+        if (xcodeScheme != null) {
+            commands.add("-scheme");
+            commands.add(xcodeScheme);
+        }
         if (xcodeSdk != null) {
             commands.add("-sdk");
             commands.add(xcodeSdk);
         }
+
+        commands.add("build");
+        commands.add("ONLY_ACTIVE_ARCH=NO");
 
         commands.add("OBJROOT=" + buildDirectory);
         commands.add("SYMROOT=" + buildDirectory);
