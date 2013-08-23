@@ -94,6 +94,10 @@ public class GHUnitTestMojo extends AbstractXcodeMojo {
                 commands.add("--retina");
             }
 
+            if (tallDevice) {
+                commands.add("--tall");
+            }
+
             ProcessHelper.killSimulatorProcess(getLog());
 
             try {

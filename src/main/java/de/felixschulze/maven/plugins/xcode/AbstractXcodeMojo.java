@@ -183,6 +183,13 @@ public abstract class AbstractXcodeMojo extends AbstractMojo {
     protected Boolean retinaDevice;
 
     /**
+     * Should test device started as 4-Inch
+     *
+     * @parameter default-value="False"
+     */
+    protected Boolean tallDevice;
+
+    /**
      * App Name
      *
      * @parameter default-value="False"
