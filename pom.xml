@@ -3,7 +3,7 @@
     <groupId>de.felixschulze.maven.plugins.xcode</groupId>
     <artifactId>xcode-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>2.0</version>
+    <version>2.1-SNAPSHOT</version>
     <name>XCode Maven Plugin</name>
     <description>A maven build plugin for iOS continuous integration builds</description>
 
@@ -28,7 +28,7 @@
         <connection>scm:git:git://github.com/x2on/xcode-maven-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:x2on/xcode-maven-plugin.git</developerConnection>
         <url>https://github.com/x2on/xcode-maven-plugin</url>
-      <tag>xcode-maven-plugin-2.0</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <properties>
